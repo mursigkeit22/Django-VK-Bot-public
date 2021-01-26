@@ -1,0 +1,10 @@
+.profile-contain {
+  width: 100%;
+  max-width: 900px;
+
+  margin: 0 auto;
+}
+
+.card {
+    border-radius: 10rem;}
+

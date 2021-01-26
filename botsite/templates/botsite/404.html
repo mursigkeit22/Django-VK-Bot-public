@@ -1,0 +1,32 @@
+{% extends 'botsite/base.html' %}
+{% load static %}
+
+
+{% block Title %}VKBot-404{% endblock %}
+
+{% block Content %}
+<link href="{% static 'botsite/css/404.css' %}" rel="stylesheet">
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-template">
+                <h1>
+                    Упс!</h1>
+                <h2>
+                    Ошибка 404</h2>
+                <div class="error-details">
+                     Такой странички нет!
+                </div>
+                <div class="error-actions">
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span>
+                        Вернуться на главную страницу </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

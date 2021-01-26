@@ -1,0 +1,19 @@
+{% extends 'botsite/base.html' %}
+{% load static %}
+
+{% block Title %}Home{% endblock %}
+
+
+{% block Content %}
+
+<div class="container main-content">
+      {% if user.is_authenticated %}
+
+    <p> Здравствуйте, {{ user.first_name}} {{ user.last_name }}! </p>
+    {% endif %}
+
+
+    <p> Здесь будет о том, что бот умеет и зачем он нужен</p>
+</div>
+{% endblock %}
+

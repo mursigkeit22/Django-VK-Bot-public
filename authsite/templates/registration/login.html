@@ -1,0 +1,23 @@
+{% extends 'botsite/base.html' %}
+{% load static %}
+
+
+{% block Title %}Login{% endblock %}
+
+{% block Content %}
+
+
+<link href="{% static 'authsite/css/login.css' %}" rel="stylesheet">
+<link href="{% static 'authsite/css/form_signin.css' %}" rel="stylesheet">
+
+
+
+    <a href="{% url 'vk_auth' %}"><img src="{% static 'authsite/images/vk_icon10.png' %}" class="image-size mb-5 "></a>
+    <h1 class="h3 font-weight-normal">Войти через ВКонтакте</h1>
+
+<!--media with stretched link!!!   https://getbootstrap.com/docs/4.4/utilities/stretched-link/ -->
+
+
+
+{% endblock %}
+

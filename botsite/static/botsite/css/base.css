@@ -1,0 +1,31 @@
+
+
+body {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  background-color: #fdfafc;
+  justify-content: center;
+}
+
+.main-content {
+
+  padding-top: 5rem;
+  padding-bottom: 40px;}
+
+
+.center-content {
+  width: 100%;
+  max-width: 900px;
+
+  margin: 0 auto;
+}
+
+.hr-text {
+            display: flex;
+            flex-direction: row;
+        }
+.hr-text:before,
+.hr-text:after{content: "  ";
+            flex: 1 1;
+            border-bottom: 1px solid #000;
+            margin: auto; }

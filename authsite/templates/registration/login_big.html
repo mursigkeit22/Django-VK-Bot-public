@@ -1,0 +1,48 @@
+{% extends 'botsite/base.html' %}
+{% load static %}
+
+
+{% block Title %}Login{% endblock %}
+
+{% block Content %}
+
+
+<link href="{% static 'authsite/css/login.css' %}" rel="stylesheet">
+<link href="{% static 'authsite/css/form_signin.css' %}" rel="stylesheet">
+<form method="post" class="form-signin" >
+
+<!--серая картинка логотип с VKBot-->
+
+    <h1 class="h3 mb-5 font-weight-normal">Войти с помощью учетной записи</h1>
+    <p>
+
+    </p>
+
+    {% csrf_token %}
+     {% if form.username.errors %}{% for error in form.username.errors %}<p class="error">{{ error }}</p>{% endfor %}{% endif %}
+    <div class="form-group">
+    <label for="username" class="sr-only">Логин:</label>
+    <input type="text" id="username" name="username" class="form-control rounded-pill"  placeholder="Логин" required autofocus >
+        </div>
+    <div class="form-group">
+    <label for="password" class="sr-only">Пароль:</label>
+    <input type="password" id="password" name = "password" class="form-control rounded-pill" placeholder="Пароль" required autofocus>
+</div>
+    <button class="btn btn-sm btn-secondary rounded-pill"  value = "Login" type="submit" >&#8194;&#8194;Login&#8194;&#8194;</button>
+    <p>
+    </p>
+    <p>
+        <a href="{% url 'account_creation_info' %}">Как создать учетную запись</a></p>
+
+<p>
+    </p>
+<p class="hr-text"> &#8194;или&#8194; </p>
+    <a href="{% url 'vk_auth' %}"><img src="{% static 'authsite/images/vk_icon10.png' %}" class="image-size"></a>
+    <h1 class="h3 mb-3 font-weight-normal">Войти через ВКонтакте</h1>
+
+
+</form>
+
+
+{% endblock %}
+

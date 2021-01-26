@@ -1,0 +1,61 @@
+{% extends 'botsite/base.html' %}
+{% load static %}
+
+{% block Title %}Profile{% endblock %}
+{% block Menu %}
+<li class="nav-item active">
+    <a class="nav-link mr-1" style="color: #fdfafc !important;" href="{% url 'logout' %}">Выйти</a>
+
+</li>
+{% endblock %}
+
+{% block Content %}
+
+
+<link href="{% static 'botsite/css/profile.css' %}" rel="stylesheet">
+<div class="container main-content center-content ">
+    <h3 class=" mb-5">Здравствуйте, {{ user.first_name}} {{ user.last_name }}!</h3>
+
+
+    <div class=" container  mb-4">
+
+
+        <h6 class=" text-left mb-4">
+            <span> Ваши чаты </span></h6>
+
+        {% for conversation in conversations %}
+        <div class="card" >
+            <div class="card-body" style="padding-bottom: 0rem;">
+
+
+                    <div class="text-secondaryd-flex h-100 mask  ">
+                        <div class="first-content align-self-center  ">
+                            <div  class="card-title" >
+                                <p>ID: {{conversation.chat_id}}</p> <p>{{conversation.title}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+            </div>
+        </div>
+        <p></p>
+        {% empty %}
+        <div class="card">
+            <div class="card-body">
+                VKBot еще не подключен ни к одному из ваших чатов.
+                Как это сделать - читайте по ссылке.
+
+            </div>
+        </div>
+        {% endfor %}
+
+
+    </div>
+
+
+</div>
+{% endblock %}
+
+<!--<a  href="#" class="text-decoration-none" >-->
+<!-- <a  href="{% url 'conversation_settings' conversation=conversation.peer_id %}" class="text-decoration-none" >-->

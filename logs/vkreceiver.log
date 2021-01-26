@@ -1,0 +1,42 @@
+[ad38bfa199bd4ca4bec4e36ba9e249ec] [16/Jan/2021 07:31:39]  ====================
+[ad38bfa199bd4ca4bec4e36ba9e249ec] [16/Jan/2021 07:31:39]  {'type': 'confirmation', 'group_id': 188881180}
+[8f2c3e268268417ea2a4ccdbae1541c8] [16/Jan/2021 07:31:39]  ====================
+[8f2c3e268268417ea2a4ccdbae1541c8] [16/Jan/2021 07:31:39]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': 'some text', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '222222'}
+[d9efd7f9cf52474ab8f6c246d96a5a19] [16/Jan/2021 07:31:39]  ====================
+[d9efd7f9cf52474ab8f6c246d96a5a19] [16/Jan/2021 07:31:39]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': '/reg on', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '12345678910'}
+[0968161084474bfdb0863e5711d25593] [16/Jan/2021 07:50:57]  ====================
+[0968161084474bfdb0863e5711d25593] [16/Jan/2021 07:50:57]  {'type': 'confirmation', 'group_id': 188881180}
+[f3fe50b763cc40659265f1f37d05692d] [16/Jan/2021 07:50:57]  ====================
+[f3fe50b763cc40659265f1f37d05692d] [16/Jan/2021 07:50:57]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': 'some text', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '222222'}
+[5b53f23ef6a744f5baed833b14b6bda1] [16/Jan/2021 07:50:57]  ====================
+[5b53f23ef6a744f5baed833b14b6bda1] [16/Jan/2021 07:50:57]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': '/reg on', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '12345678910'}
+[b1687e1769874476b4e957e754f64f7a] [16/Jan/2021 17:24:34]  ====================
+[b1687e1769874476b4e957e754f64f7a] [16/Jan/2021 17:24:34]  {'type': 'confirmation', 'group_id': 188881180}
+[f731ebdb324b4ef78bbc028446285013] [16/Jan/2021 17:24:34]  ====================
+[f731ebdb324b4ef78bbc028446285013] [16/Jan/2021 17:24:34]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': 'some text', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '222222'}
+[b8beaa70d30c4646ac5dff5285ae8c30] [16/Jan/2021 17:24:34]  ====================
+[b8beaa70d30c4646ac5dff5285ae8c30] [16/Jan/2021 17:24:34]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': '/reg on', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '12345678910'}
+[ecc1c155a4274c23bb1128709238fc2e] [16/Jan/2021 19:44:34]  ====================
+[ecc1c155a4274c23bb1128709238fc2e] [16/Jan/2021 19:44:34]  {'type': 'confirmation', 'group_id': 188881180}
+[22921b3ef0a446d1a0b697f366e5bf5d] [16/Jan/2021 19:44:34]  ====================
+[22921b3ef0a446d1a0b697f366e5bf5d] [16/Jan/2021 19:44:34]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': 'some text', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '222222'}
+[a802ce99d10c4683ab8096329c136961] [16/Jan/2021 19:44:34]  ====================
+[a802ce99d10c4683ab8096329c136961] [16/Jan/2021 19:44:34]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': '/reg on', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '12345678910'}
+[c5c23b30874b49f29799c63289d3eaf0] [17/Jan/2021 11:03:12]  ====================
+[c5c23b30874b49f29799c63289d3eaf0] [17/Jan/2021 11:03:12]  {'type': 'confirmation', 'group_id': 188881180}
+[b972b01d0f814246a3b2b78cd1a90c8e] [17/Jan/2021 11:03:12]  ====================
+[b972b01d0f814246a3b2b78cd1a90c8e] [17/Jan/2021 11:03:12]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': 'some text', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '222222'}
+[454facc00f884bfaa4aad1d47302ca1d] [17/Jan/2021 11:03:12]  ====================
+[454facc00f884bfaa4aad1d47302ca1d] [17/Jan/2021 11:03:12]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': '/reg on', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '12345678910'}
+[b5165423ee854bdfa479da9059e802e7] [20/Jan/2021 13:17:37]  ====================
+[b5165423ee854bdfa479da9059e802e7] [20/Jan/2021 13:17:37]  {'type': 'confirmation', 'group_id': 188881180}
+[712894ac191f428ab1d2de1a391617d9] [20/Jan/2021 13:17:37]  ====================
+[712894ac191f428ab1d2de1a391617d9] [20/Jan/2021 13:17:37]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': 'some text', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '222222'}
+[98aa4b1088f741fcb6aac790346aefb1] [20/Jan/2021 13:17:38]  ====================
+[98aa4b1088f741fcb6aac790346aefb1] [20/Jan/2021 13:17:38]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': '/reg on', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 188881180, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '12345678910'}
+[273699b99114409dbfdd7694f77c2233] [20/Jan/2021 13:48:19]  ====================
+[273699b99114409dbfdd7694f77c2233] [20/Jan/2021 13:48:19]  {'type': 'confirmation', 'group_id': 188881180}
+[b6ef8e72793846d0896bd93714509f03] [20/Jan/2021 13:48:19]  ====================
+[b6ef8e72793846d0896bd93714509f03] [20/Jan/2021 13:48:19]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': 'some text', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 186232173, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': 'nge58635hgg294'}
+[3d0696204a934054a548f8e40fb5d996] [20/Jan/2021 13:48:20]  ====================
+[3d0696204a934054a548f8e40fb5d996] [20/Jan/2021 13:48:20]  {'type': 'message_new', 'object': {'date': 1579158373, 'from_id': 21070693, 'id': 0, 'out': 0, 'peer_id': 2000000005, 'text': '/reg on', 'conversation_message_id': 21, 'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [], 'is_hidden': False}, 'group_id': 186232173, 'event_id': '0d68190a19c440062461b2a94c3f7a3f02a3b648', 'secret': '12345678910'}

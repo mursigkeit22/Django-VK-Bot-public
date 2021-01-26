@@ -1,0 +1,37 @@
+{% extends 'botsite/base.html' %}
+{% load static %}
+
+
+{% block Title %}Random post{% endblock %}
+
+{% block Content %}
+
+
+<link href="{% static 'botsite/css/random_post.css' %}" rel="stylesheet">
+
+
+
+
+<div class="container main-content center-content ">
+<form action="." method="POST">
+    {% csrf_token %}
+     {% if chat_setting_form.random_post_group.errors %}{% for error in chat_setting_form.random_post_group.errors %}<p class="error">{{ error }}</p>{% endfor %}{% endif %}
+    <label for="id_random_post_group">Группа</label>
+    <input type="text" id="id_random_post_group" name="random_post_group"
+           class="form-control rounded-pill" value="{{ chat_setting_form.random_post_group.value|default_if_none:'' }}"/>
+
+
+     <label for="id_random_post_mode">Включить</label>
+    <input type="checkbox" id="id_random_post_mode" name="random_post_mode" {% if chat_conversation_form.random_post_mode.value %}checked{% endif %} />
+
+
+    <p><input type="submit" value="Сохранить"></p>
+
+</form>
+
+
+
+</div>
+
+{% endblock %}
+
