@@ -1,0 +1,52 @@
+getConversationsById_chat_good_response = {'response': {'count': 1,
+  'items': [{'peer': {'id': 2000000005, 'type': 'chat', 'local_id': 5},
+    'last_message_id': 0,
+    'in_read': 0,
+    'out_read': 0,
+    'is_marked_unread': False,
+    'important': False,
+    'can_write': {'allowed': True},
+    'chat_settings': {'owner_id': 21070693,
+     'title': '20005',
+     'state': 'in',
+     'acl': {'can_change_info': True,
+      'can_change_invite_link': False,
+      'can_change_pin': True,
+      'can_invite': True,
+      'can_promote_users': False,
+      'can_see_invite_link': False,
+      'can_moderate': True,
+      'can_copy_chat': True,
+      'can_call': True,
+      'can_use_mass_mentions': True,
+      'can_change_service_type': False},
+     'members_count': 2,
+     'admin_ids': [-188881180],
+     'active_ids': [21070693, -188881180],
+     'is_group_channel': False,
+     'is_service': False}}]}}
+
+getConversationsById_ERROR_response = {'error': {'error_code': 10,
+  'error_msg': 'Internal server error',
+  'request_params': [{'key': 'peer_ids', 'value': '2100000006'},
+   {'key': 'v', 'value': '5.92'},
+   {'key': 'method', 'value': 'messages.getConversationsById'},
+   {'key': 'oauth', 'value': '1'}]}}
+
+getConversationsById_user_good_response = {'response': {'count': 1,
+  'items': [{'peer': {'id': 21070693, 'type': 'user', 'local_id': 21070693},
+    'in_read': 37,
+    'out_read': 37,
+    'last_message_id': 37,
+    'can_write': {'allowed': True}}]}}
+
+getConversationsById_chat_bot_not_admin = {'response': {'count': 0, 'items': []}}
+
+getConversationsById_user_allowed_write_false = {'response': {'count': 1,
+  'items': [{'peer': {'id': 21070693, 'type': 'user', 'local_id': 21070693},
+    'last_message_id': 1077,
+    'in_read': 1077,
+    'out_read': 1077,
+    'is_marked_unread': False,
+    'important': False,
+    'can_write': {'allowed': False, 'reason': 901}}]}}
