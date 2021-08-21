@@ -12,10 +12,12 @@ BOT_TOKEN = os.environ['BOT_TOKEN']
 LOGIN_LINK = os.environ['LOGIN_LINK']
 
 BOT_GROUPID = int(os.environ['BOT_GROUPID'])
-BOT_NAME = os.environ['BOT_NAME']
+BOT_NAME1 = os.environ['BOT_NAME1']
+BOT_NAME2 = os.environ['BOT_NAME2']
 
 VK_AUTH_ID = os.environ['VK_AUTH_ID']
 VK_AUTH_SECRET = os.environ['VK_AUTH_SECRET']
 VK_REDIRECT_URI = os.environ['VK_REDIRECT_URI']
-VK_AUTHORIZATION_URL = 'http://oauth.vk.com/authorize'
+VK_AUTHORIZATION_URL = 'https://oauth.vk.com/authorize'
 VK_ACCESS_TOKEN_URL = 'https://oauth.vk.com/access_token/'
+SMARTREPLY_MAX_COUNT = 150

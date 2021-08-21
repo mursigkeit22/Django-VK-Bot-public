@@ -1,3 +1,4 @@
+import logging
 import os
 
 from django.contrib.auth import login
@@ -9,6 +10,8 @@ from requests_oauthlib import OAuth2Session
 from authsite.utils import get_user_data
 from botsite.models import UserProfile
 from web_vk.constants import VK_AUTH_SECRET, VK_REDIRECT_URI, VK_AUTHORIZATION_URL, VK_ACCESS_TOKEN_URL, VK_AUTH_ID
+
+site_logger = logging.getLogger('site')
 
 
 
@@ -23,12 +26,13 @@ def vk_auth(request):
         request.session['oauth_state'] = state
         return redirect(authorization_url)
     except Exception as e:
-        print("vkauth exception")
-        print(e)
+        site_logger.info(f"vkauth exception {e}")
+
 
 
 def vk_auth_callback(request):
     try:
+        site_logger.info("in vk_auth_callback")
         oauth = OAuth2Session(client_id=VK_AUTH_ID,
                               redirect_uri=VK_REDIRECT_URI,
                               state=request.session['oauth_state'])
@@ -36,8 +40,8 @@ def vk_auth_callback(request):
                                        client_secret=VK_AUTH_SECRET, include_client_id=True,
                                        authorization_response=request.build_absolute_uri())
         vk_user_id = token_data['user_id']
-        print(token_data)
     except AccessDeniedError as e:
+        site_logger.info(f"redirecting to access_denied with error: {e}")
         return redirect('access_denied')
 
     try:
@@ -47,7 +51,7 @@ def vk_auth_callback(request):
         profile.save()
         login(request, user)
 
-    except UserProfile.DoesNotExist as e:
+    except UserProfile.DoesNotExist:
         user_data = get_user_data(token_data.get('access_token'))
         user = User.objects.create_user(user_data['screen_name'], first_name=user_data['first_name'],
                                         last_name=user_data['last_name'])

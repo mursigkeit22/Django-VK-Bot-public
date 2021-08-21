@@ -24,7 +24,9 @@ LOGGING = {
 
         'sends_file': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/send.log'),
             'formatter': 'simple',
             'filters': ['request_id'],
@@ -32,7 +34,9 @@ LOGGING = {
 
         'django_file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/django.log'),
             'formatter': 'simple',
             'filters': ['request_id'],
@@ -41,7 +45,9 @@ LOGGING = {
         # for the most important events; will get to code_process and info_code_process logs
         'info_file': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/info_code_process.log'),
             'formatter': 'simple',
             'filters': ['request_id'],
@@ -49,14 +55,18 @@ LOGGING = {
 
         'vkreceiver_file': {
             'level': 'INFO',  # what's the difference in this case? what's most sensible way?
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/vkreceiver.log'),
             'formatter': 'simple',
             'filters': ['request_id'],
         },
         'request_vk_file': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/request_vk.log'),
             'formatter': 'simple',
             'filters': ['request_id'],
@@ -65,21 +75,43 @@ LOGGING = {
 
         'site_file': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/site.log'),
+            'formatter': 'simple',
+            'filters': ['request_id'],
+        },
+        'stat_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/stat.log'),
             'formatter': 'simple',
             'filters': ['request_id'],
         },
 
         'code_process_file': {
-            'class': 'logging.FileHandler',
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/code_process.log'),
             'formatter': 'simple',
             'filters': ['request_id'],
         },
+
+        'newpost_periodic_file': {'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*5,
+            'backupCount': 1,
+            'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/newpost_periodic.log'),
+            'formatter': 'simple',
+            'filters': ['request_id'],},
+
         'catch_all': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*10,  # 10 MB
+            'backupCount': 1,
             'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs/catch_all.log'),
             'formatter': 'verbose',
             'filters': ['request_id'],
@@ -104,6 +136,7 @@ LOGGING = {
         'code_process': {
             'handlers': ['code_process_file', 'info_file'],
             'propagate': False,
+            'level': 'DEBUG',
 
         },
         'request_vk': {
@@ -119,6 +152,18 @@ LOGGING = {
             'level': 'INFO',
 
         },
+        'stat': {
+            'handlers': ['stat_file'],
+            'propagate': False,
+            'level': 'INFO',
+
+        },
+        'newpost_periodic': {
+            'handlers': ['newpost_periodic_file'],
+            'propagate': False,
+            'level': 'INFO',
+        },
+
         '': {
             'handlers': ['catch_all'],
             'level': 'DEBUG',

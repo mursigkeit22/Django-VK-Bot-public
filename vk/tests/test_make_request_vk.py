@@ -1,13 +1,9 @@
-import os
-
 from django.test import TestCase
 import vk.tests.data_for_tests.group_links as links
 
 from vk import models, helpers
 from vk.helpers import PersonalTokenException
 from vk.tests.data_for_tests.message_data import OwnerAndBotChatData
-from botsite.models import UserProfile
-from django.contrib.auth.models import User
 
 from vk.tests.shared.pipelines_and_setups import PipelinesAndSetUps
 from web_vk.constants import test_personal_token, test_personal_expired_token

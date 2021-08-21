@@ -1,58 +1,39 @@
 from vk.actions.RandomPostAction import RandomPostAction
+from vk.bot_answer import BotAnswer
 from vk.command_handler import *
 
-from vk.helpers import random_post
+from vk.helpers import random_post, option_info, option_delete, option_on, option_group, option_off
+from vk.usertext import random_post_dict
+from vk.vkbot_exceptions import PrerequisitesError, AlreadyDoneError
 
 
+@helpers.class_logger()
 class RandomPostCommandHandler(CommandHandler):
-    def __init__(self, text_instance, chat_db_object):
-
-        super().__init__(text_instance, chat_db_object)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.command_word = random_post
 
-    def valid_option(self):
-        return super().common_group_valid_option(random_post)
-
-    def process_chat(self):
-
+    def get_option(self):
+        self.setting_db_object = models.RandomPostSetting.objects.get(
+            chat_id=self.chat_db_object)
+        if not self.setting_db_object.random_post_mode:
+            self.check_for_owner_silent_option(
+                error_description="random_post_mode is false. Nothing will be sent.")
         if len(self.wordlist) == 1:
             self.option = "post"
-            bot_answer = self.command()
-        else:
-            if self.from_id == self.chat_db_object.owner_id:  # not using check_for_owner 'cause we don't want to send not-owner-message yet
-                option = self.valid_option()
-                if option[0]:
-                    self.option = option[1]
-                    bot_answer = self.command()
+            return
+        self.check_for_owner_silent_option(
+            bot_response=f"Для вас доступна команда {self.command_word} без дополнительных опций.")
+        super().common_group_get_option()
 
-                else:
-                    bot_answer = option[1]
-            else:
-                option = self.valid_option()
-                if option[0]:
-                    bot_answer = f"Для вас доступна команда {random_post} без дополнительных опций."
-                else:
-                    bot_answer = option[1]
-                super().send_message(bot_answer)
-        return bot_answer
+    def process_chat(self):
+        self.get_option()
+        return self.command()
 
     def process_user(self):
-
-        proceed, bot_answer = super().process_user_part()
-        if proceed:
-            if len(self.wordlist) == 1:
-                self.option = "post"
-                bot_answer = self.command()
-            else:
-                option = self.valid_option()
-                if option[0]:
-                    self.option = option[1]
-                    bot_answer = self.command()
-
-                else:
-                    bot_answer = option[1]
-
-        return bot_answer
+        super().process_user_part()
+        self.get_option()
+        return self.command()
 
     def command(self):
         """
@@ -60,72 +41,64 @@ class RandomPostCommandHandler(CommandHandler):
         Group tokens aren't allowed.
 
         """
-        self.setting_db_object = models.RandomPostSetting.objects.get(chat_id=self.chat_db_object)
+
         if self.option == 'post':
             if self.setting_db_object.random_post_mode:
-                return RandomPostAction(self.peer_id, self.setting_db_object, self.chat_db_object).process()
+                return RandomPostAction(self.setting_db_object, self.chat_db_object, self.message).process()
             else:
-                if self.from_id == self.chat_db_object.owner_id:
-                    bot_answer = f"Чтобы включить команду {random_post}, воспользуйтесь командой {random_post} on."
-                    super().send_message(bot_answer)
-                else:
-                    bot_answer = "nothing will be sent"
+                raise PrerequisitesError(self.message,
+                                         bot_response=f"Чтобы включить команду {self.command_word}, воспользуйтесь командой {random_post} {option_on}.")
 
-        elif self.option == "delete":
+        elif self.option == option_delete:
             if self.setting_db_object.random_post_group_link:
                 self.setting_db_object.random_post_mode = False
                 self.setting_db_object.random_post_group_link = ""
                 self.setting_db_object.random_post_group_id = None
                 self.setting_db_object.save()
-                bot_answer = f'Группа для команды {random_post} удалена из настроек. Команда {random_post} выключена.'
+                bot_response = random_post_dict['delete']
+                return BotAnswer("RANDOM_POST_DELETE", self.message, bot_response=bot_response)
             else:
-                bot_answer = f"У вас нет сохраненной группы для команды {random_post}."
-            super().send_message(bot_answer)
+                raise PrerequisitesError(self.message,
+                                         bot_response=random_post_dict['delete_cannot'])
 
-        elif self.option == 'off':
+        elif self.option == option_off:
             if self.setting_db_object.random_post_mode:
                 self.setting_db_object.random_post_mode = False
                 self.setting_db_object.save()
-                bot_answer = f'Команда {random_post} выключена.'
+                return BotAnswer("RANDOM_POST_OFF", self.message, bot_response=random_post_dict['off'])
             else:
-                bot_answer = f'Команда {random_post} уже выключена.'
-            super().send_message(bot_answer)
+                raise AlreadyDoneError(self.message, bot_response=random_post_dict['off_already'])
 
-        elif self.option == 'on':
-            proceed, bot_answer = self.check_for_personal_token()
+        elif self.option == option_on:
+            self.check_for_personal_token()
 
-            if proceed:
-                if self.setting_db_object.random_post_group_link:
-                    group = self.setting_db_object.random_post_group_link
+            if self.setting_db_object.random_post_group_link:
+                group = self.setting_db_object.random_post_group_link
 
-                    if not self.setting_db_object.random_post_mode:
-                        self.setting_db_object.random_post_mode = True
-                        self.setting_db_object.save()
-                        bot_answer = f'Команда {random_post} включена. По этой команде в чат будет приходить случайно выбранный пост из группы {group}.'
-                    else:
-                        bot_answer = f'Команда {random_post} уже включена. Группа в настройках: {group}.'
+                if not self.setting_db_object.random_post_mode:
+                    self.setting_db_object.random_post_mode = True
+                    self.setting_db_object.save()
+                    bot_response = random_post_dict['on'].substitute(group_link=group)
+                    return BotAnswer("RANDOM_POST_ON", self.message, bot_response=bot_response)
                 else:
-                    bot_answer = f"Чтобы пользоваться командой '{random_post} on', сохраните в настройках ссылку на группу. " \
-                                 f"Сделать это можно командой {random_post} group," \
-                                 f" например: {random_post} group https://vk.com/link_to_the_group"
-            super().send_message(bot_answer)
+                    bot_response = random_post_dict['on_already'].substitute(group_link=group)
+                    raise AlreadyDoneError(self.message, bot_response=bot_response)
+            else:
+                bot_response = random_post_dict['on_cannot']
+                raise PrerequisitesError(self.message, bot_response=bot_response)
 
-
-        elif self.option == 'info':
+        elif self.option == option_info:
             if self.setting_db_object.random_post_group_link:
                 group = self.setting_db_object.random_post_group_link
                 if self.setting_db_object.random_post_mode:
-                    bot_answer = f'Команда {random_post} включена. Группа в настройках: {group}.'
-                    super().send_message(bot_answer)
+                    bot_response = random_post_dict['info_on'].substitute(group_link=group)
                 else:
-                    bot_answer = f'Для команды {random_post} у вас зарегистрирована группа {group}. Команда {random_post} выключена.'
-                    super().send_message(bot_answer)
+                    bot_response = random_post_dict['info_off'].substitute(group_link=group)
             else:
-                bot_answer = f"У вас нет сохраненной группы для команды {random_post}."
-                super().send_message(bot_answer)
+                bot_response = random_post_dict['info_no_group']
+            return BotAnswer("RANDOM_POST_INFO", self.message, bot_response=bot_response)
 
         else:
-
             group_screen_name, group_id = self.option
 
             random_post_group_link = "https://vk.com/" + group_screen_name
@@ -134,13 +107,7 @@ class RandomPostCommandHandler(CommandHandler):
             self.setting_db_object.save()
 
             if not self.setting_db_object.random_post_mode:
-
-                bot_answer = f'Группа {random_post_group_link} сохранена в настройках.' \
-                             f' Чтобы включить команду {random_post} , воспользуйтесь командой {random_post} on'
+                bot_response = random_post_dict['group_saved_off'].substitute(group_link=random_post_group_link)
             else:
-                bot_answer = f'Группа {random_post_group_link} сохранена в настройках.' \
-                             f' Команда {random_post} включена.'
-            super().send_message(bot_answer)
-            return bot_answer
-        return bot_answer
-
+                bot_response = random_post_dict['group_saved_on'].substitute(group_link=random_post_group_link)
+            return BotAnswer("RANDOM_POST_GROUP", self.message, bot_response=bot_response)

@@ -23,7 +23,6 @@ def profile(request):
     conversations = Chat.objects.filter(owner_id=idVK)
     context = {'conversations': conversations}
 #TODO: делать запрос в контакт и получать имя чата
-    # имя чата?
     return render(request, "botsite/profile.html", context)
 
 

@@ -86,7 +86,7 @@ def group_validator(value):
                     return group.screen_name, group.group_id
 
     code_logger.debug(
-        f'In validate_group. group.screen_name: {group.screen_name},  group_name (from user): {group_name}, '
+        f'In group_validator. group.screen_name: {group.screen_name},  group_name (from user): {group_name}, '
         f' group.is_closed: {group.is_closed},  group.deactivated: {group.deactivated}')
     raise ValidationError(_(error_text),
                           params={'value': value},

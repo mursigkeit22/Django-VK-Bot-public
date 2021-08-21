@@ -22,7 +22,8 @@ phrase_3999 = """Во дни сомнений, во дни тягостных р
 
 hopppp."""
 
-smart_reply_two_sends = """ID: 76. Сообщение-триггер: hello . Smart-ответ: hello
+smart_reply_two_sends = """ID: 75. Сообщение-триггер: hello . Smart-ответ: hello
+ID: 76. Сообщение-триггер: hello . Smart-ответ: hello
 ID: 77. Сообщение-триггер: hello . Smart-ответ: hello
 ID: 78. Сообщение-триггер: hello . Smart-ответ: hello
 ID: 79. Сообщение-триггер: hello . Smart-ответ: hello

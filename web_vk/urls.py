@@ -8,8 +8,7 @@ urlpatterns = [
     path('', include('vk.urls')),
     path('', include('botsite.urls')),
     path('', include('authsite.urls')),
-    path('capacity/', vk.views.capacity_test),
-    path('capacity2/', vk.views.capacity_test2),
+
 
 ]
 handler500 = 'botsite.views.error_500'

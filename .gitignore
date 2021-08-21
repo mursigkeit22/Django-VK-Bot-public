@@ -5,11 +5,9 @@ myvenv
 db.sqlite3
 web_vk/static/**/*
 venv
-/static
 .idea/
 help_info
 local_*
 logs
 /*/migrations/[0-9]*
-
 

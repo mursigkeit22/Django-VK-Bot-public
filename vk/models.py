@@ -1,4 +1,3 @@
-import datetime
 
 from django.db import models
 from django.utils import timezone
@@ -47,17 +46,13 @@ class IntervalPhrase(models.Model):
     phrase = models.CharField(max_length=4000)
 
 
-
-
 class SmartReply(models.Model):
     id = models.AutoField(primary_key=True)
     chat_id = models.ForeignKey(Chat, on_delete=models.CASCADE)
     trigger = models.CharField(max_length=100)
     reply = models.CharField(max_length=100)
     last_used = models.DateTimeField(default=five_minutes_ago, blank=True)
-
-
-
+    regex = models.BooleanField(default=False)
 
 
 class NewPostSetting(models.Model):

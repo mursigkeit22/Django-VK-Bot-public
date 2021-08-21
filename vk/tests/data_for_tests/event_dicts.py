@@ -1,6 +1,6 @@
 import os
 
-from vk.tests.data_for_tests.message_data import OwnerAndBotChatData
+from vk.tests.data_for_tests.message_data import OwnerAndBotChatData, NotAdminChatData
 
 VK_SECRET = os.environ['VK_SECRET']
 BOT_GROUPID = int(os.environ['BOT_GROUPID'])
@@ -15,6 +15,13 @@ event_dict_simple_message = {'type': 'message_new', 'object__date': 1600330657, 
 
 event_dict_simple_message_not_me = {'type': 'message_new', 'object__date': 1600330657, 'object__from_id': 12345678, 'object__id': 0,
                      'object__out': 0, 'object__peer_id': OwnerAndBotChatData.peer_id,
+                     'object__text': 'hop', 'object__conversation_message_id': 1223, 'object__fwd_messages': [],
+                     'object__important': False, 'object__random_id': 0, 'object__attachments': [],
+                     'object__is_hidden': False, 'group_id': BOT_GROUPID,
+                     'event_id': '2bec39b2d68d6941316221b3f998502b4f9e8b73', 'secret': VK_SECRET}
+
+event_dict_simple_message_not_admin = {'type': 'message_new', 'object__date': 1600330657, 'object__from_id': NotAdminChatData.owner_id, 'object__id': 0,
+                     'object__out': 0, 'object__peer_id': NotAdminChatData.peer_id,
                      'object__text': 'hop', 'object__conversation_message_id': 1223, 'object__fwd_messages': [],
                      'object__important': False, 'object__random_id': 0, 'object__attachments': [],
                      'object__is_hidden': False, 'group_id': BOT_GROUPID,

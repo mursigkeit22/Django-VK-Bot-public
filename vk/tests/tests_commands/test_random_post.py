@@ -2,23 +2,24 @@ from typing import Optional
 
 from django.test import TestCase
 
+import vk.tests.data_for_tests.group_links as links
 from vk import models
-from vk.helpers import random_post, PersonalTokenException
+from vk.helpers import random_post, option_on, option_info, option_group, option_delete
 from vk.tests.data_for_tests.message_data import OwnerAndBotChatData
 from vk.tests.shared.pipelines_and_setups import PipelinesAndSetUps
-from web_vk.constants import test_personal_expired_token, LOGIN_LINK
 from vk.tests.shared.shared_tests.common_group_tests import NOGROUPTestMixin, THEREISGROUPOffTestMixin, \
-    THEREISGROUPOnTestMixin
+    THEREISGROUPOnTestMixin, TurnOffDeleteChangeONMixin, TurnOnDeleteChangeOFFMixin, AddGroupMixin, \
+    NoProfileModeOFFMixin, ExpiredTokenModeOFFMixin
 from vk.tests.shared.shared_tests.user_specific_commands_test import UserSpecificCommandsMixinTest
-import vk.tests.data_for_tests.group_links as links
-
-
-# TODO: сделать остальные миксины
+from vk.usertext import random_post_dict, common_dict
+from web_vk.constants import test_personal_expired_token
 
 
 class Shared:
-    command = f"{random_post}"
+    command = random_post
     setting_model = models.RandomPostSetting
+    command_code = "RANDOM_POST"
+    text_dict = random_post_dict
 
     def check_db(self, mode: bool, grouplink: str, groupid: Optional[int]):
         self.setting_object.refresh_from_db()
@@ -31,7 +32,7 @@ class UserSpecificRandomPostTest(TestCase, Shared, UserSpecificCommandsMixinTest
     pass
 
 
-class RandomPostNOGROUPTest(TestCase, Shared, NOGROUPTestMixin):  # 6 + 1
+class RandomPostNOGROUPTest(TestCase, Shared, NOGROUPTestMixin):  # 5 + 2
     field_dict = dict()
 
     @classmethod
@@ -39,15 +40,15 @@ class RandomPostNOGROUPTest(TestCase, Shared, NOGROUPTestMixin):  # 6 + 1
         super().setup_with_user_profile()
 
     def test_post_option(self):
-        expected_answer = f"Чтобы включить команду {self.command}, воспользуйтесь командой {self.command} on."
-        self.pipeline_chat_from_owner("", expected_answer)
+        bot_response = f"Чтобы включить команду {self.command}, воспользуйтесь командой {self.command} {option_on}."
+        self.pipeline_chat_from_owner("", "PREREQUISITES_ERROR", bot_response=bot_response)
 
     def test_chat_not_owner(self):
-        expected_answer = f'Для вас доступна команда {self.command} без дополнительных опций.'
-        self.pipeline_chat_not_owner("info", expected_answer)
+        self.pipeline_chat_not_owner(option_info, 'NOT_OWNER',
+                                     event_description="random_post_mode is false. Nothing will be sent.")
 
 
-class RandomPostTHEREISGROUPOffTest(TestCase, Shared, THEREISGROUPOffTestMixin):  # 3
+class RandomPostTHEREISGROUPOffTest(TestCase, Shared, THEREISGROUPOffTestMixin):  # 2+1
 
     field_dict = {"random_post_group_link": links.normal_group1,
                   "random_post_group_id": links.normal_group1ID, "random_post_mode": False}
@@ -57,8 +58,8 @@ class RandomPostTHEREISGROUPOffTest(TestCase, Shared, THEREISGROUPOffTestMixin):
         super().setup_with_user_profile()
 
     def test_chat_not_owner(self):
-        expected_answer = 'Для вас доступна команда /post без дополнительных опций.'
-        self.pipeline_chat_not_owner("off", expected_answer)
+        self.pipeline_chat_not_owner(option_info, 'NOT_OWNER',
+                                     event_description="random_post_mode is false. Nothing will be sent.")
 
 
 class RandomPostTHEREISGROUPOnTest(TestCase, Shared, THEREISGROUPOnTestMixin):  # 3 + 1
@@ -71,190 +72,102 @@ class RandomPostTHEREISGROUPOnTest(TestCase, Shared, THEREISGROUPOnTestMixin):  
         super().setup_with_user_profile()
 
     def test_post(self):
-        expected_answer = "random post is sent."
-        self.pipeline_user("", expected_answer)
-        self.pipeline_chat_from_owner("", expected_answer)
+        self.pipeline_part_dict(OwnerAndBotChatData.owner_id, OwnerAndBotChatData.owner_id,
+                                f"{self.command} {OwnerAndBotChatData.peer_id}",
+                                "RANDOM_POST_SENT", {"peer_id": OwnerAndBotChatData.peer_id})
+        self.pipeline_part_dict(OwnerAndBotChatData.peer_id, OwnerAndBotChatData.owner_id, self.command,
+                                "RANDOM_POST_SENT", {"peer_id": OwnerAndBotChatData.peer_id},
+                                )
 
     def test_chat_not_owner(self):
-        expected_answer = f'Для вас доступна команда {self.command} без дополнительных опций.'
-        self.pipeline_chat_not_owner("on", expected_answer)
+        bot_response = f'Для вас доступна команда {self.command} без дополнительных опций.'
+        self.pipeline_chat_not_owner(option_info, 'NOT_OWNER', bot_response=bot_response)
 
 
-class RandomPostTurnOffDeleteChangeONTest(TestCase, Shared, PipelinesAndSetUps):  # 7
+class RandomPostTurnOffDeleteChangeONTest(TestCase, Shared, TurnOffDeleteChangeONMixin):  # 7
     field_dict = {"random_post_group_link": links.normal_group1,
                   "random_post_group_id": links.normal_group1ID, "random_post_mode": True}
 
     def setUp(self):
         super().setup_with_user_profile()
 
-    def test_off_chat(self):
-        expected_answer = f'Команда {self.command} выключена.'
-        self.pipeline_chat_from_owner("off", expected_answer)
-        self.check_db(False, links.normal_group1, links.normal_group1ID)
-
-    def test_off_user(self):
-        expected_answer = f'Команда {self.command} выключена.'
-        self.pipeline_user("off", expected_answer)
-        self.check_db(False, links.normal_group1, links.normal_group1ID)
-
-    def test_delete_chat(self):
-        expected_answer = f'Группа для команды {self.command} удалена из настроек. Команда {self.command} выключена.'
-        self.pipeline_chat_from_owner("group delete", expected_answer)
-        self.check_db(False, "", None)
-
-    def test_delete_user(self):
-        expected_answer = f'Группа для команды {self.command} удалена из настроек. Команда {self.command} выключена.'
-        self.pipeline_user("group delete", expected_answer)
-        self.check_db(False, "", None)
-
-    def test_change_group_chat(self):
-        expected_answer = f'Группа {links.normal_group2} сохранена в настройках. Команда {self.command} включена.'
-        self.pipeline_chat_from_owner(f"group {links.normal_group2}", expected_answer)
-        self.check_db(True, links.normal_group2, links.normal_group2ID)
-
-    def test_change_group_user(self):
-        expected_answer = f'Группа {links.normal_group2} сохранена в настройках. Команда {self.command} включена.'
-        self.pipeline_user(f"group {links.normal_group2}", expected_answer)
-        self.check_db(True, links.normal_group2, links.normal_group2ID)
-
     def test_chat_not_owner(self):
-        expected_answer = f'Для вас доступна команда {self.command} без дополнительных опций.'
-        self.pipeline_chat_not_owner("group delete", expected_answer)
+        bot_response = f'Для вас доступна команда {self.command} без дополнительных опций.'
+        self.pipeline_chat_not_owner(f"{option_group} {option_delete}", 'NOT_OWNER', bot_response=bot_response)
 
 
-class RandomPostTurnOnDeleteChangeOFFTest(TestCase, Shared, PipelinesAndSetUps):  # 6 + 2
+class RandomPostTurnOnDeleteChangeOFFTest(TestCase, Shared, TurnOnDeleteChangeOFFMixin):  # 6 + 2
     field_dict = {"random_post_group_link": links.normal_group1,
                   "random_post_group_id": links.normal_group1ID, "random_post_mode": False}
 
     def setUp(self):
         super().setup_with_user_profile()
 
-    def test_change_group_chat(self):
-        expected_answer = f'Группа {links.normal_group2} сохранена в настройках.' \
-                          f' Чтобы включить команду {self.command} , воспользуйтесь командой {self.command} on'
-        self.pipeline_chat_from_owner(f"group {links.normal_group2}", expected_answer)
-        self.check_db(False, links.normal_group2, links.normal_group2ID)
-
-    def test_change_group_user(self):
-        expected_answer = f'Группа {links.normal_group2} сохранена в настройках.' \
-                          f' Чтобы включить команду {self.command} , воспользуйтесь командой {self.command} on'
-        self.pipeline_user(f"group {links.normal_group2}", expected_answer)
-        self.check_db(False, links.normal_group2, links.normal_group2ID)
-
-    def test_on_group_chat(self):
-        expected_answer = f'Команда {self.command} включена. По этой команде в чат будет приходить случайно выбранный пост из группы {links.normal_group1}.'
-        self.pipeline_chat_from_owner("on", expected_answer)
-        self.check_db(True, links.normal_group1, links.normal_group1ID)
-
-    def test_on_group_user(self):
-        expected_answer = f'Команда {self.command} включена. По этой команде в чат будет приходить случайно выбранный пост из группы {links.normal_group1}.'
-        self.pipeline_user("on", expected_answer)
-        self.check_db(True, links.normal_group1, links.normal_group1ID)
-
-    def test_delete_chat(self):
-        expected_answer = f'Группа для команды {self.command} удалена из настроек. Команда {self.command} выключена.'
-        self.pipeline_chat_from_owner("group delete", expected_answer)
-        self.check_db(False, "", None)
-
-    def test_delete_user(self):
-        expected_answer = f'Группа для команды {self.command} удалена из настроек. Команда {self.command} выключена.'
-        self.pipeline_user("group delete", expected_answer)
-        self.check_db(False, "", None)
-
     def test_post(self):
-        expected_answer = f"Чтобы включить команду {self.command}, воспользуйтесь командой {self.command} on."
-        self.pipeline_user("", expected_answer)
-        self.pipeline_chat_from_owner("", expected_answer)
+        bot_response = f"Чтобы включить команду {self.command}, воспользуйтесь командой {self.command} on."
+        self.pipeline_user("", "PREREQUISITES_ERROR", bot_response=bot_response)
+        self.pipeline_chat_from_owner("", "PREREQUISITES_ERROR", bot_response=bot_response)
 
     def test_post_not_chat_owner(self):
-        expected_answer = "nothing will be sent"
-        self.pipeline_chat_not_owner("", expected_answer)
+        self.pipeline_chat_not_owner("", 'NOT_OWNER',
+                                     event_description="random_post_mode is false. Nothing will be sent.")
 
 
-class RandomPostAddGroup(TestCase, Shared, PipelinesAndSetUps):  # 4
+class RandomPostAddGroup(TestCase, Shared, AddGroupMixin):  # 4
     field_dict = dict()
 
     def setUp(self):
         super().setup_with_user_profile()
 
-    def test_add_group_chat(self):
-        expected_answer = f'Группа {links.normal_group2} сохранена в настройках.' \
-                          f' Чтобы включить команду {self.command} , воспользуйтесь командой {self.command} on'
-        self.pipeline_chat_from_owner(f"group {links.normal_group2}", expected_answer)
-        self.check_db(False, links.normal_group2, links.normal_group2ID)
 
-    def test_add_group_user(self):
-        expected_answer = f'Группа {links.normal_group2} сохранена в настройках.' \
-                          f' Чтобы включить команду {self.command} , воспользуйтесь командой {self.command} on'
-        self.pipeline_user(f"group {links.normal_group2}", expected_answer)
-        self.check_db(False, links.normal_group2, links.normal_group2ID)
-
-    def test_add_bad_group_chat(self):
-        expected_answer = f'Группа {links.nonexisting_group} не может быть зарегистрирована для команды {self.command}.' \
-                          ' Убедитесь, что ссылка правильная, и группа не является закрытой'
-        self.pipeline_chat_from_owner(f"group {links.nonexisting_group}", expected_answer)
-        self.check_db(False, "", None)
-
-    def test_add_bad_group_user(self):
-        expected_answer = f'Группа {links.nonexisting_group} не может быть зарегистрирована для команды {self.command}.' \
-                          ' Убедитесь, что ссылка правильная, и группа не является закрытой'
-        self.pipeline_user(f"group {links.nonexisting_group}", expected_answer)
-        self.check_db(False, "", None)
-
-
-class RandomPostNoProfileModeOFFTest(TestCase, Shared, PipelinesAndSetUps):  # 3
+class RandomPostNoProfileModeOFFTest(TestCase, Shared, NoProfileModeOFFMixin):  # 3
     field_dict = {"random_post_group_link": links.normal_group1,
                   "random_post_group_id": links.normal_group1ID, "random_post_mode": False}
-    expected_answer = f"Чтобы пользоваться командой '{random_post} on', пройдите по ссылке {LOGIN_LINK}"
 
-    def setUp(self):
-        super().setup()
-
-    def test_on_group_user(self):
-        self.pipeline_user("on", self.expected_answer)
-
-    def test_on_group_chat(self):
-        self.pipeline_chat_from_owner("on", self.expected_answer)
+    @classmethod
+    def setUpTestData(cls):
+        super().setup_with_setting_object()
 
     def test_on_not_chat_owner(self):
-        expected_answer = f'Для вас доступна команда {self.command} без дополнительных опций.'
-        self.pipeline_chat_not_owner("on", expected_answer)
+        self.pipeline_chat_not_owner(option_on, 'NOT_OWNER',
+                                     event_description="random_post_mode is false. Nothing will be sent.")
 
 
-class RandomPostExpiredTokenModeOFFTest(TestCase, Shared, PipelinesAndSetUps):  # 3
+class RandomPostExpiredTokenModeOFFTest(TestCase, Shared, ExpiredTokenModeOFFMixin):  # 3
     field_dict = {"random_post_group_link": links.normal_group1,
                   "random_post_group_id": links.normal_group1ID, "random_post_mode": False}
-    expected_answer = f'Обновите токен по ссылке {LOGIN_LINK}'
 
-    def setUp(self):
-        super().setup()
+    @classmethod
+    def setUpTestData(cls):
+        super().setup_with_setting_object()
         super().set_user_profile(test_personal_expired_token)
 
-    def test_on_group_user(self):
-        self.pipeline_user("on", self.expected_answer)
-
-    def test_on_group_chat(self):
-        self.pipeline_chat_from_owner("on", self.expected_answer)
-
     def test_on_not_chat_owner(self):
-        expected_answer = f'Для вас доступна команда {self.command} без дополнительных опций.'
-        self.pipeline_chat_not_owner("on", expected_answer)
+        self.pipeline_chat_not_owner(option_on, 'NOT_OWNER',
+                                     event_description="random_post_mode is false. Nothing will be sent.")
 
 
 class RandomPostExpiredTokenModeONTest(TestCase, Shared, PipelinesAndSetUps):  # 3
     field_dict = {"random_post_group_link": links.normal_group1,
                   "random_post_group_id": links.normal_group1ID, "random_post_mode": True}
-    expected_answer = f"Для корректной работы бота пройдите по ссылке {LOGIN_LINK}."
+    bot_response = {
+        "message": common_dict["refresh_token"].substitute(command=Shared.command),
+        "peer_id": OwnerAndBotChatData.owner_id}
+    event_description = "An error message is sent to chat owner."
 
-    def setUp(self):
-        super().setup()
+    @classmethod
+    def setUpTestData(cls):
+        super().setup_with_setting_object()
         super().set_user_profile(test_personal_expired_token)
 
     def test_on_group_user(self):
-        self.pipeline_user("", self.expected_answer)
+        self.pipeline_user("", "USER_PROFILE_ERROR", bot_response=self.bot_response,
+                           event_description=self.event_description)
 
-    def test_on_group_chat(self):
-        self.pipeline_chat_from_owner("", self.expected_answer)
+    def test_on_group_chat(self):  # message is sent to chat owner (not to the chat)
+        self.pipeline_chat_from_owner("", "USER_PROFILE_ERROR", bot_response=self.bot_response,
+                                      event_description=self.event_description)
 
     def test_on_not_chat_owner(self):  # message is sent to chat owner (not to the user who called '/post' command)
-        self.pipeline_chat_not_owner("", self.expected_answer)
+        self.pipeline_chat_not_owner("", "USER_PROFILE_ERROR",
+                                     bot_response=self.bot_response, event_description=self.event_description)

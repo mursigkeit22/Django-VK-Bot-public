@@ -1,25 +1,21 @@
 from unittest import mock
+
 from django.test import TestCase
 
-import vk.models as models
-from vk.tests.data_for_tests.message_data import OwnerAndBotChatData, input_data
-from vk.vkreceiver_event_handler import EventHandler
+from vk.helpers import registration
+from vk.tests.data_for_tests.message_data import OwnerAndBotChatData
+from vk.tests.shared.pipelines_and_setups import PipelinesAndSetUps
+from vk.tests.tests_mockAPIcalls import mock_shared
 
 
-def side_effect(plain_text):
-    return plain_text
-
-
-class RegistrationCommandTest(TestCase):
+class RegistrationCommandTest(TestCase, PipelinesAndSetUps):
+    command = registration
 
     def setUp(self):
-        models.Chat.objects.create(
-            chat_id=OwnerAndBotChatData.peer_id, owner_id=OwnerAndBotChatData.owner_id, conversation_is_registered=True)
+        self.basic_setup()
 
-    @mock.patch('vk.command_handler.CommandHandler.send_message')
-    def test_info(self, mock_send_message, side_effect=side_effect):
-        mock_send_message.side_effect = side_effect
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg info', OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = f'ID вашей беседы {OwnerAndBotChatData.peer_id}'
-        self.assertEqual(answer, expected_answer)
+    @mock.patch('vk.helpers.make_request_vk')
+    def test_info(self, mock_make_request_vk, side_effect=mock_shared.side_effect_make_request):
+        mock_make_request_vk.side_effect = side_effect
+        self.pipeline_chat_from_owner("info", "REGISTRATION_INFO",
+                                      bot_response=f'ID вашей беседы {OwnerAndBotChatData.peer_id}')

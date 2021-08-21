@@ -1,151 +1,168 @@
 from django.test import TestCase
-from vk.vkreceiver_event_handler import EventHandler
+
 import vk.models as models
-from vk.tests.data_for_tests.message_data import input_data, OwnerAndBotChatData
+import vk.tests.data_for_tests.group_links as links
+from vk.helpers import registration, option_on, option_off, option_info
+from vk.tests.data_for_tests.message_data import OwnerAndBotChatData
+from vk.tests.shared.pipelines_and_setups import PipelinesAndSetUps
 
 
-class RegistrationTests(TestCase):
-    """
-        Bot must have admin rights in chats for tests to work.
+class SharedMethods(TestCase, PipelinesAndSetUps):
+    command = registration
 
-        """
-
-    def registration_on_chat_owner(self):
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg on', OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = f'Беседа успешно зарегистрирована, ID вашей беседы: {OwnerAndBotChatData.peer_id}'
-        self.assertEqual(answer, expected_answer)
-        chat_object = models.Chat.objects.filter(chat_id=OwnerAndBotChatData.peer_id)
-        new_post_setting_object_exists = models.NewPostSetting.objects.filter(chat_id=chat_object[0]).exists()
-        random_post_setting_object_exists = models.RandomPostSetting.objects.filter(chat_id=chat_object[0]).exists()
+    def check_db(self, expected):
+        chat_db_object = models.Chat.objects.get(chat_id=OwnerAndBotChatData.peer_id)
+        new_post_setting_object_exists = models.NewPostSetting.objects.filter(chat_id=chat_db_object).exists()
+        random_post_setting_object_exists = models.RandomPostSetting.objects.filter(chat_id=chat_db_object).exists()
         kick_non_members_setting_object_exists = models.KickNonMembersSetting.objects.filter(
-            chat_id=chat_object[0]).exists()
-        chat_is_registered = chat_object[0].conversation_is_registered
-        self.assertTrue(chat_is_registered)
-        self.assertTrue(new_post_setting_object_exists)
-        self.assertTrue(random_post_setting_object_exists)
-        self.assertTrue(kick_non_members_setting_object_exists)
+            chat_id=chat_db_object).exists()
+        self.assertEqual(expected, chat_db_object.conversation_is_registered)
+        self.assertEqual(expected, new_post_setting_object_exists)
+        self.assertEqual(expected, random_post_setting_object_exists)
+        self.assertEqual(expected, kick_non_members_setting_object_exists)
 
-    def registration_on_chat_not_owner(self):
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg on', OwnerAndBotChatData.not_owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = "Conversation isn't registered. Nothing will be sent."
-        self.assertEqual(answer, expected_answer)
-        chat_object = models.Chat.objects.filter(chat_id=OwnerAndBotChatData.peer_id)
-        chat_is_registered = chat_object[0].conversation_is_registered
-        self.assertFalse(chat_is_registered)
+    def check_db_registration_off(self):
+        self.chat_db_object.refresh_from_db()
+        self.newpost_setting_object.refresh_from_db()
+        self.kick_setting_object.refresh_from_db()
+        self.randompost_setting_object.refresh_from_db()
 
-    def registration_info_chat_owner(self):
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg info', OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = "Conversation isn't registered. Nothing will be sent."
-        self.assertEqual(answer, expected_answer)
+        self.assertFalse(self.chat_db_object.conversation_is_registered)
+        self.assertFalse(self.chat_db_object.interval_mode)
+        self.assertFalse(self.chat_db_object.smart_mode)
+        self.assertIsNone(self.chat_db_object.interval)
+        self.assertIsNone(self.chat_db_object.messages_till_endpoint)
+
+        self.assertFalse(self.newpost_setting_object.newpost_mode)
+        self.assertEqual(self.newpost_setting_object.newpost_group_link, "")
+        self.assertIsNone(self.newpost_setting_object.newpost_group_id)
+
+        self.assertFalse(self.kick_setting_object.kick_nonmembers_mode)
+        self.assertEqual(self.kick_setting_object.kick_nonmembers_group_link, "")
+        self.assertIsNone(self.kick_setting_object.kick_nonmembers_group_id)
+
+        self.assertFalse(self.randompost_setting_object.random_post_mode)
+        self.assertEqual(self.randompost_setting_object.random_post_group_link, "")
+        self.assertIsNone(self.randompost_setting_object.random_post_group_id)
+
+        interval_phrase_exists = models.IntervalPhrase.objects.filter(chat_id=self.chat_db_object).exists()
+        self.assertTrue(interval_phrase_exists)
+
+        smart_phrase_exists = models.SmartReply.objects.filter(chat_id=self.chat_db_object).exists()
+        self.assertTrue(smart_phrase_exists)
 
 
-class RegistrationFirstTimeTests(RegistrationTests):
+class RegistrationFirstTimeTests(SharedMethods):
 
-    def test_registration_on_chat_owner(self):
-        self.registration_on_chat_owner()
+    def test_chat_owner_register(self):
+        self.pipeline_chat_from_owner(option_on, 'REGISTRATION_SUCCESSFUL',
+                                      bot_response=f'Беседа успешно зарегистрирована, '
+                                                   f'ID вашей беседы: {OwnerAndBotChatData.peer_id}')
 
-    def test_registration_on_chat_not_owner(self):
-        self.registration_on_chat_not_owner()
+        self.check_db(True)
 
-    def test_registration_info_chat_owner(self):
-        self.registration_info_chat_owner()
+    def test_chat_not_owner_tries_register(self):
+        self.pipeline_chat_not_owner(option_on, 'NOT_OWNER', )
+        self.check_db(False)
+
+    def test_ask_reg_info_before_registration(self):
+        self.pipeline_chat_from_owner(option_info, "NOT_REGISTERED",
+                                      event_description="Conversation isn't registered. Nothing will be sent.")
+
+    def test_ask_reg_off_before_registration(self):
+        self.pipeline_chat_from_owner(option_off, "NOT_REGISTERED",
+                                      event_description="Conversation isn't registered. Nothing will be sent.")
 
 
-class RegistrationWithExistingDBEntryTests(RegistrationTests):
+class RegistrationWithExistingDBEntryTests(SharedMethods):
     def setUp(self):
-        models.Chat.objects.create(
-            chat_id=OwnerAndBotChatData.peer_id, owner_id=OwnerAndBotChatData.owner_id,
-            conversation_is_registered=False)
+        self.basic_setup(is_registered=False)
 
-    def test_registration_on_chat_owner(self):
-        self.registration_on_chat_owner()
+    def test_chat_owner_register(self):
+        self.pipeline_chat_from_owner(option_on, 'REGISTRATION_SUCCESSFUL', bot_response=f'Беседа успешно зарегистрирована, '
+                                                                                    f'ID вашей беседы: {OwnerAndBotChatData.peer_id}')
+        self.check_db(True)
 
-    def test_registration_on_chat_not_owner(self):
-        self.registration_on_chat_not_owner()
+    def test_chat_not_owner_tries_register(self):
+        self.pipeline_chat_not_owner(option_on, 'NOT_OWNER', )
+        self.chat_db_object.refresh_from_db()
+        self.assertFalse(self.chat_db_object.conversation_is_registered)
 
-    def test_registration_info_chat_owner(self):
-        self.registration_info_chat_owner()
+    def test_ask_reg_info_before_registration(self):
+        self.pipeline_chat_from_owner(option_info, "NOT_REGISTERED",
+                                      event_description="Conversation isn't registered. Nothing will be sent.")
+        self.chat_db_object.refresh_from_db()
+        self.assertFalse(self.chat_db_object.conversation_is_registered)
 
-    def test_registration_on_user_owner(self):
-        data = input_data(peer_id=OwnerAndBotChatData.owner_id, text=f'/reg {OwnerAndBotChatData.peer_id} on',
-                          from_id=OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = "Команду /reg нельзя использовать в личной беседе с ботом."
-        self.assertEqual(answer, expected_answer)
+    def test_ask_reg_off_before_registration(self):
+        self.pipeline_chat_from_owner(option_off, "NOT_REGISTERED",
+                                      event_description="Conversation isn't registered. Nothing will be sent.")
+        self.chat_db_object.refresh_from_db()
+        self.assertFalse(self.chat_db_object.conversation_is_registered)
+
+    def test_user_owner_tries_register(self):
+        self.pipeline_user(option_on, 'USER_REG_ERROR',
+                           bot_response=f"Команду {self.command} нельзя использовать в личной беседе с ботом.", )
 
 
-class RegistrationInfoRegisteredTrueTests(TestCase):
+class RegistrationInfoRegisteredTrueTests(SharedMethods):
 
     @classmethod
     def setUpTestData(cls):
-        models.Chat.objects.create(
-            chat_id=OwnerAndBotChatData.peer_id, owner_id=OwnerAndBotChatData.owner_id, conversation_is_registered=True)
+        cls().basic_setup()
 
     def test_info(self):
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg info', OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = f'ID вашей беседы {OwnerAndBotChatData.peer_id}'
-        self.assertEqual(answer, expected_answer)
+        self.pipeline_chat_from_owner(option_info, "REGISTRATION_INFO",
+                                      bot_response=f'ID вашей беседы {OwnerAndBotChatData.peer_id}')
 
     def test_info_not_owner(self):
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg info', OwnerAndBotChatData.not_owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = 'Только владелец беседы может использовать эту команду.'
-        self.assertEqual(answer, expected_answer)
+        self.pipeline_chat_not_owner(option_info, 'NOT_OWNER',
+                                     bot_response=f'Только владелец беседы может использовать команду {self.command}.')
 
-    def test_info_wrong_command(self):
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg inf', OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = f'У команды /reg нет опции inf'
-        self.assertEqual(answer, expected_answer)
+    def test_info_wrong_option(self):
+        self.pipeline_chat_from_owner('inf', 'WRONG_OPTION',
+                                      bot_response=f"У команды {self.command} нет опции 'inf'")
 
     def test_info_extra_word(self):
-        data = input_data(OwnerAndBotChatData.peer_id, '/reg info extra', OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = f'ID вашей беседы {OwnerAndBotChatData.peer_id}'
-        self.assertEqual(answer, expected_answer)
+        self.pipeline_chat_from_owner(f'{option_info} extra word', "REGISTRATION_INFO",
+                                      bot_response=f'ID вашей беседы {OwnerAndBotChatData.peer_id}')
 
     def test_registration_info_user_owner(self):
-        data = input_data(peer_id=OwnerAndBotChatData.owner_id, text=f'/reg {OwnerAndBotChatData.peer_id} info',
-                          from_id=OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = "Команду /reg нельзя использовать в личной беседе с ботом."
-        self.assertEqual(answer, expected_answer)
+        self.pipeline_user(option_info, 'USER_REG_ERROR',
+
+                           bot_response=f"Команду {self.command} нельзя использовать в личной беседе с ботом.", )
 
 
-class RegistrationOffRegisteredTrueTests(TestCase):
+class RegistrationOffRegisteredTrueTests(SharedMethods):
 
     def setUp(self):
-
-        chat_db_object = models.Chat.objects.create(
-            chat_id=OwnerAndBotChatData.peer_id, owner_id=OwnerAndBotChatData.owner_id, conversation_is_registered=True)
-        models.RandomPostSetting.objects.update_or_create(chat_id=chat_db_object)
-        models.NewPostSetting.objects.update_or_create(chat_id=chat_db_object)
-        models.KickNonMembersSetting.objects.update_or_create(chat_id=chat_db_object)
+        self.setup_chat(is_registered=True, interval_mode=True, interval=4,
+                        messages_till_endpoint=1)
+        models.IntervalPhrase.objects.create(chat_id=self.chat_db_object, phrase="phrase1")
+        models.SmartReply.objects.create(chat_id=self.chat_db_object, trigger="trigger-message",
+                                         reply="smart_reply")
+        self.setup_newpost(group_link=links.normal_group1,
+                           group_id=links.normal_group1ID,
+                           mode=True)
+        self.setup_kick(group_link=links.normal_group1,
+                        group_id=links.normal_group1ID,
+                        mode=True)
+        self.setup_randompost(group_link=links.normal_group1,
+                              group_id=links.normal_group1ID,
+                              mode=True)
 
     def test_registration_off_chat_owner(self):
-        data = input_data(peer_id=OwnerAndBotChatData.peer_id, text=f'/reg off',
-                          from_id=OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = "Регистрация отменена: бот будет игнорировать вас и ваши команды."
-        self.assertEqual(answer, expected_answer)
-        chat_object = models.Chat.objects.filter(chat_id=OwnerAndBotChatData.peer_id)
-        new_post_setting_mode = models.NewPostSetting.objects.filter(chat_id=chat_object[0])[0].newpost_mode
-        random_post_setting_mode = models.RandomPostSetting.objects.filter(chat_id=chat_object[0])[0].random_post_mode
-        kick_non_members_setting_mode = models.KickNonMembersSetting.objects.filter(
-            chat_id=chat_object[0])[0].kick_nonmembers_mode
-        chat_is_registered = chat_object[0].conversation_is_registered
-        self.assertFalse(chat_is_registered)
-        self.assertFalse(new_post_setting_mode)
-        self.assertFalse(random_post_setting_mode)
-        self.assertFalse(kick_non_members_setting_mode)
+        self.pipeline_chat_from_owner(option_off, "REGISTRATION_OFF",
+                                      bot_response="Регистрация отменена: бот будет игнорировать вас и ваши команды.")
+
+        self.check_db_registration_off()
 
     def test_registration_off_user_owner(self):
-        data = input_data(peer_id=OwnerAndBotChatData.owner_id, text=f'/reg {OwnerAndBotChatData.peer_id} off',
-                          from_id=OwnerAndBotChatData.owner_id)
-        answer = EventHandler(data).process()
-        expected_answer = "Команду /reg нельзя использовать в личной беседе с ботом."
-        self.assertEqual(answer, expected_answer)
+        self.pipeline_user(option_off, 'USER_REG_ERROR',
+
+                           bot_response=f"Команду {self.command} нельзя использовать в личной беседе с ботом.", )
+        self.check_db(True)
+
+    def test_registration_already_on(self):
+        self.pipeline_chat_from_owner(option_on, "ALREADY_DONE",
+                                      bot_response=f'Эта беседа уже зарегистрирована, ID вашей беседы {OwnerAndBotChatData.peer_id}')

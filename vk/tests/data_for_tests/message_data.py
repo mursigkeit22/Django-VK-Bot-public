@@ -1,87 +1,65 @@
 from typing import Optional
 
-from web_vk.constants import BOT_GROUPID, VK_SECRET
+from web_vk.constants import BOT_GROUPID, VK_SECRET, BOT_NAME1
 
 my_personal_ID = 21070693
 
 
-class OwnerAndBotChatDataVarya:
-    peer_id = 2000000005
-    owner_id = 21070693
-    not_owner_id = 12345678
-
-
-class OwnerAndBotChatDataKiril:
-    peer_id = 2000000002
-    owner_id = 21070693
-    not_owner_id = 12345678
-
-
-# TODO: change for kiril/varya
 class OwnerAndBotChatData:
-    peer_id = OwnerAndBotChatDataVarya.peer_id
-    owner_id = OwnerAndBotChatDataVarya.owner_id
+    if 'варя' in BOT_NAME1:
+        peer_id = 2000000005
+    elif 'кирил' in BOT_NAME1:
+        peer_id = 2000000002
+    owner_id = my_personal_ID
     not_owner_id = 12345678
     first_name = 'Валерия'
     last_name = 'Иванова'
     screen_name = 'id21070693'
 
 
-# for Varya-bot and for Kiril-bot
 class FakeChatData:
     peer_id = 2000000010
     owner_id = 12345678
 
 
-class NotAdminChatDataVarya:
-    peer_id = 2000000006
-    owner_id = 21070693
+class NoAdminThereIsAccessToMessagesThereIsDBEntryChatData:
+    pass
 
 
-class NotAdminChatDataKiril:
-    peer_id = 2000000004
-    owner_id = 21070693
-
-
-# TODO: change for kiril/varya
 class NotAdminChatData:
-    peer_id = NotAdminChatDataVarya.peer_id
-    owner_id = NotAdminChatDataVarya.owner_id
+    if 'варя' in BOT_NAME1:
+        peer_id = 2000000006
+    elif 'кирил' in BOT_NAME1:
+        peer_id = 2000000003
+    owner_id = my_personal_ID
 
 
-class NotRegisteredButAdminKirill:
-    peer_id = 2000000008
-    owner_id = 21070693
+class NotAdminNoAccessToMessagesThereIsDBEntryChatData:
+    if 'варя' in BOT_NAME1:
+        peer_id = 2000000002
+
+    elif 'кирил' in BOT_NAME1:
+        peer_id = 2000000004
+    owner_id = my_personal_ID
+    not_owner_id = 12345678
 
 
-class NotRegisteredButAdminVarya:
-    peer_id = 2000000001
-    owner_id = 21070693
-
-
-# TODO: change for kiril/varya
 class NotRegisteredChatData:
-    peer_id = NotRegisteredButAdminVarya.peer_id
-    owner_id = NotRegisteredButAdminVarya.owner_id
+    if 'варя' in BOT_NAME1:
+        peer_id = 2000000001
+    elif 'кирил' in BOT_NAME1:
+        peer_id = 2000000008
+    owner_id = my_personal_ID
 
 
-class RemoveActionChatDataVarya:
-    peer_id = 2000000003
-    owner_id = 21070693
-    local_id = 3
-
-
-class RemoveActionChatDataKiril:
-    peer_id = 2000000001
-    owner_id = 21070693
-    local_id = 1
-
-
-# TODO: change for kiril/varya
-class RemoveActionChatData:
-    peer_id = RemoveActionChatDataVarya.peer_id
-    owner_id = RemoveActionChatDataVarya.owner_id
-    local_id = RemoveActionChatDataVarya.local_id
+class KickActionChatData:
+    if 'варя' in BOT_NAME1:
+        peer_id = 2000000003
+        local_id = 3
+    elif 'кирил' in BOT_NAME1:
+        peer_id = 2000000001
+        local_id = 1
+    owner_id = my_personal_ID
 
 
 def input_data(peer_id: int, text: str, from_id: int, vk_secret: Optional[str] = VK_SECRET):
